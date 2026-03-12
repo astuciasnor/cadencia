@@ -55,7 +55,11 @@ const dom = {
   pwaInstallFeedback: document.querySelector("#pwa-install-feedback"),
   pwaInstallHelp: document.querySelector("#pwa-install-help"),
   pwaInstallInstructions: document.querySelector("#pwa-install-instructions"),
+  pwaAvailabilityBadge: document.querySelector("#pwa-availability-badge"),
   pwaInstalledBadge: document.querySelector("#pwa-installed-badge"),
+  pwaUpdateToast: document.querySelector("#pwa-update-toast"),
+  pwaUpdateMessage: document.querySelector("#pwa-update-message"),
+  pwaUpdateButton: document.querySelector("#pwa-update-button"),
   dayPlanSummary: document.querySelector("#day-plan-summary"),
   dayPlanStandaloneForm: document.querySelector("#day-plan-standalone-form"),
   dayPlanStandaloneInput: document.querySelector("#day-plan-standalone-input"),
@@ -145,7 +149,20 @@ const {
 } = uiFeedback;
 
 let timer = createFallbackTimer();
+let isReloadingForServiceWorkerUpdate = false;
 const phaseEndSound = createPhaseEndSound();
+const pwaSupport = setupPwaSupport({
+  installPanel: dom.pwaInstallPanel,
+  installButton: dom.pwaInstallButton,
+  installFeedback: dom.pwaInstallFeedback,
+  installHelp: dom.pwaInstallHelp,
+  installInstructions: dom.pwaInstallInstructions,
+  availabilityBadge: dom.pwaAvailabilityBadge,
+  installedBadge: dom.pwaInstalledBadge,
+  updateToast: dom.pwaUpdateToast,
+  updateMessage: dom.pwaUpdateMessage,
+  updateButton: dom.pwaUpdateButton
+});
 const appEvents = createAppEvents({
   dom,
   onTimerStart: () => {
@@ -199,14 +216,6 @@ function initializeApp() {
     setActiveDayPlanView(appState.activeDayPlanView);
     syncStateFromStore();
     renderCurrentDate();
-    setupPwaSupport({
-      installPanel: dom.pwaInstallPanel,
-      installButton: dom.pwaInstallButton,
-      installFeedback: dom.pwaInstallFeedback,
-      installHelp: dom.pwaInstallHelp,
-      installInstructions: dom.pwaInstallInstructions,
-      installedBadge: dom.pwaInstalledBadge
-    });
     hydrateSettingsForm();
     renderTaskUi();
     renderDayPlanUi();
@@ -2167,7 +2176,8 @@ function registerServiceWorker() {
 
   window.addEventListener("load", async () => {
     try {
-      await navigator.serviceWorker.register("./sw.js");
+      const registration = await navigator.serviceWorker.register("./sw.js");
+      attachServiceWorkerUpdateHandlers(registration);
     } catch (error) {
       console.warn("Nao foi possivel registrar o service worker.", error);
     }
@@ -2176,4 +2186,53 @@ function registerServiceWorker() {
 
 function isLocalhost() {
   return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+}
+
+function attachServiceWorkerUpdateHandlers(registration) {
+  if (!registration) {
+    return;
+  }
+
+  if (registration.waiting) {
+    pwaSupport.showUpdateReady(() => activateServiceWorkerUpdate(registration));
+  } else {
+    pwaSupport.clearUpdateNotice();
+  }
+
+  registration.addEventListener("updatefound", () => {
+    const installingWorker = registration.installing;
+    if (!installingWorker) {
+      return;
+    }
+
+    installingWorker.addEventListener("statechange", () => {
+      if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+        pwaSupport.showUpdateReady(() => activateServiceWorkerUpdate(registration));
+      }
+    });
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!isReloadingForServiceWorkerUpdate) {
+      return;
+    }
+
+    window.location.reload();
+  }, { once: true });
+}
+
+async function activateServiceWorkerUpdate(registration) {
+  isReloadingForServiceWorkerUpdate = true;
+  pwaSupport.showUpdating();
+
+  if (registration.waiting) {
+    registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    return;
+  }
+
+  if (typeof registration.update === "function") {
+    await registration.update();
+  }
+
+  window.location.reload();
 }

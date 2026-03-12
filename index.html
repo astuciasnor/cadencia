@@ -40,26 +40,71 @@
         </section>
       </div>
       <div class="header-badges">
-        <span class="badge badge-soft">App instalavel</span>
+        <span id="pwa-availability-badge" class="badge badge-soft">App instalavel</span>
         <span id="pwa-installed-badge" class="badge" hidden>Rodando como app</span>
         <span id="current-date" class="badge">Hoje</span>
       </div>
     </header>
 
+    <section id="pwa-update-toast" class="update-toast" aria-live="polite" hidden>
+      <div class="update-toast-copy">
+        <p class="section-label">Atualizacao</p>
+        <p id="pwa-update-message" class="update-toast-message">Nova versao disponivel.</p>
+      </div>
+      <div class="inline-actions update-toast-actions">
+        <button id="pwa-update-button" type="button" data-variant="secondary">Atualizar agora</button>
+      </div>
+    </section>
+
     <nav class="tab-bar" aria-label="Navegacao principal" role="tablist">
-      <button class="tab-button is-active" id="tab-timer" type="button" role="tab" aria-selected="true" aria-controls="panel-timer" data-tab-button="timer" data-variant="tab">
+      <button class="tab-button is-active" id="tab-timer" type="button" role="tab" aria-label="Timer" aria-selected="true" aria-controls="panel-timer" data-tab-button="timer" data-variant="tab">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <circle cx="12" cy="13" r="7"></circle>
+            <path d="M12 13V9"></path>
+            <path d="M12 13L15 15"></path>
+            <path d="M9 3H15"></path>
+            <path d="M12 6V4"></path>
+          </svg>
+        </span>
         <span class="tab-label">Timer</span>
       </button>
-      <button class="tab-button" id="tab-projects" type="button" role="tab" aria-selected="false" aria-controls="panel-projects" data-tab-button="projects" data-variant="tab">
+      <button class="tab-button" id="tab-projects" type="button" role="tab" aria-label="Projetos" aria-selected="false" aria-controls="panel-projects" data-tab-button="projects" data-variant="tab">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"></path>
+          </svg>
+        </span>
         <span class="tab-label">Projetos</span>
       </button>
-      <button class="tab-button" id="tab-task-rhythm" type="button" role="tab" aria-selected="false" aria-controls="panel-task-rhythm" data-tab-button="task-rhythm" data-variant="tab">
+      <button class="tab-button" id="tab-task-rhythm" type="button" role="tab" aria-label="Ritmo" aria-selected="false" aria-controls="panel-task-rhythm" data-tab-button="task-rhythm" data-variant="tab">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M4 14h2.5l2-5 3 10 2.5-7H20"></path>
+          </svg>
+        </span>
         <span class="tab-label">Ritmo</span>
       </button>
-      <button class="tab-button" id="tab-day-plan" type="button" role="tab" aria-selected="false" aria-controls="panel-day-plan" data-tab-button="day-plan" data-variant="tab">
+      <button class="tab-button" id="tab-day-plan" type="button" role="tab" aria-label="Plano do dia" aria-selected="false" aria-controls="panel-day-plan" data-tab-button="day-plan" data-variant="tab">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M8 4V7"></path>
+            <path d="M16 4V7"></path>
+            <rect x="4" y="6.5" width="16" height="13.5" rx="2.5"></rect>
+            <path d="M8 12h8"></path>
+            <path d="M8 16h5"></path>
+          </svg>
+        </span>
         <span class="tab-label">Plano do dia</span>
       </button>
-      <button class="tab-button" id="tab-day-progress" type="button" role="tab" aria-selected="false" aria-controls="panel-day-progress" data-tab-button="day-progress" data-variant="tab">
+      <button class="tab-button" id="tab-day-progress" type="button" role="tab" aria-label="Progresso" aria-selected="false" aria-controls="panel-day-progress" data-tab-button="day-progress" data-variant="tab">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M5 18V11"></path>
+            <path d="M12 18V7"></path>
+            <path d="M19 18V4"></path>
+          </svg>
+        </span>
         <span class="tab-label">Progresso</span>
       </button>
     </nav>

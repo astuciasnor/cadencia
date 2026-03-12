@@ -4,14 +4,20 @@ export function setupPwaSupport(elements = {}) {
   const installFeedback = elements.installFeedback;
   const installHelp = elements.installHelp;
   const installInstructions = elements.installInstructions;
+  const availabilityBadge = elements.availabilityBadge;
   const installedBadge = elements.installedBadge;
+  const updateToast = elements.updateToast;
+  const updateMessage = elements.updateMessage;
+  const updateButton = elements.updateButton;
 
   if (!installPanel || !installFeedback || !installHelp || !installInstructions) {
-    return;
+    return createPwaFallback();
   }
 
   const state = {
-    deferredPrompt: null
+    deferredPrompt: null,
+    updateStatus: "idle",
+    updateAction: null
   };
 
   const standaloneQuery = window.matchMedia?.("(display-mode: standalone)");
@@ -85,8 +91,57 @@ export function setupPwaSupport(elements = {}) {
       installButton.disabled = !canPromptInstall;
     }
 
+    if (availabilityBadge) {
+      availabilityBadge.hidden = standalone;
+    }
+
     if (installedBadge) {
       installedBadge.hidden = !standalone;
+    }
+
+    renderUpdateState();
+  }
+
+  function renderUpdateState() {
+    if (!updateToast || !updateMessage || !updateButton) {
+      return;
+    }
+
+    if (state.updateStatus === "idle") {
+      updateToast.hidden = true;
+      updateButton.disabled = false;
+      updateButton.textContent = "Atualizar agora";
+      return;
+    }
+
+    updateToast.hidden = false;
+
+    if (state.updateStatus === "ready") {
+      updateMessage.textContent = "Nova versao disponivel. Atualize para carregar a edicao mais recente.";
+      updateButton.disabled = false;
+      updateButton.textContent = "Atualizar agora";
+      return;
+    }
+
+    updateMessage.textContent = "Atualizando o app...";
+    updateButton.disabled = true;
+    updateButton.textContent = "Atualizando...";
+  }
+
+  async function handleUpdateClick() {
+    if (typeof state.updateAction !== "function") {
+      return;
+    }
+
+    state.updateStatus = "refreshing";
+    renderUpdateState();
+
+    try {
+      await state.updateAction();
+    } catch (error) {
+      console.warn("Nao foi possivel aplicar a atualizacao da PWA.", error);
+      state.updateStatus = "ready";
+      renderUpdateState();
     }
   }
 
@@ -108,6 +163,7 @@ export function setupPwaSupport(elements = {}) {
 
     render();
   });
+  updateButton?.addEventListener("click", handleUpdateClick);
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
@@ -124,8 +180,33 @@ export function setupPwaSupport(elements = {}) {
   window.addEventListener("pageshow", render);
 
   render();
+
+  return {
+    showUpdateReady(action) {
+      state.updateAction = action;
+      state.updateStatus = "ready";
+      renderUpdateState();
+    },
+    showUpdating() {
+      state.updateStatus = "refreshing";
+      renderUpdateState();
+    },
+    clearUpdateNotice() {
+      state.updateAction = null;
+      state.updateStatus = "idle";
+      renderUpdateState();
+    }
+  };
 }
 
 function isLocalhost() {
   return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+}
+
+function createPwaFallback() {
+  return {
+    showUpdateReady() {},
+    showUpdating() {},
+    clearUpdateNotice() {}
+  };
 }

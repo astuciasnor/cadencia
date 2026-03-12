@@ -367,6 +367,44 @@ input[type="color"]::-webkit-color-swatch {
   align-self: start;
 }
 
+.update-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+  z-index: 60;
+  display: grid;
+  gap: 12px;
+  width: min(100%, 360px);
+  padding: 16px 18px;
+  border: 1px solid rgba(118, 160, 255, 0.2);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(118, 160, 255, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(17, 29, 53, 0.98) 0%, rgba(10, 18, 34, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 38px rgba(0, 0, 0, 0.34);
+}
+
+.update-toast[hidden] {
+  display: none;
+}
+
+.update-toast-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.update-toast-message {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.update-toast-actions {
+  grid-template-columns: max-content;
+}
+
 .tab-bar {
   position: sticky;
   top: 18px;
@@ -392,6 +430,9 @@ input[type="color"]::-webkit-color-swatch {
 
 .tab-button {
   position: relative;
+  display: grid;
+  place-items: center;
+  gap: 6px;
   min-height: 58px;
   padding: 8px 6px;
   border-radius: 18px;
@@ -434,6 +475,24 @@ input[type="color"]::-webkit-color-swatch {
 
 .tab-button[aria-selected="true"] {
   color: var(--text);
+}
+
+.tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.tab-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tab-label {
@@ -3549,28 +3608,59 @@ body[data-phase="long"] .timer-orb {
 
 @media (max-width: 719px) {
   .app-shell {
-    padding: 16px 12px calc(104px + env(safe-area-inset-bottom, 0px));
+    padding: 12px 10px calc(82px + env(safe-area-inset-bottom, 0px));
   }
 
   .app-header,
   .hero-panel,
   .card {
-    border-radius: 24px;
-    padding: 18px;
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .app-header {
+    gap: 12px;
+  }
+
+  body[data-active-tab="timer"] .app-header {
+    gap: 10px;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
 
   .app-title {
     max-width: none;
-    font-size: clamp(1.9rem, 10vw, 2.8rem);
+    font-size: clamp(1.8rem, 9vw, 2.5rem);
     line-height: 0.94;
   }
 
+  body[data-active-tab="timer"] .app-title {
+    max-width: 12ch;
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
   .app-subtitle {
-    font-size: 0.94rem;
+    font-size: 0.92rem;
+    margin-top: 10px;
+  }
+
+  body[data-active-tab="timer"] .app-subtitle {
+    display: none;
   }
 
   .install-panel {
-    padding: 16px;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 14px;
+  }
+
+  .install-panel-title {
+    font-size: 1rem;
+  }
+
+  .install-panel-feedback,
+  .install-help-copy {
+    font-size: 0.92rem;
   }
 
   .install-panel-actions {
@@ -3579,49 +3669,76 @@ body[data-phase="long"] .timer-orb {
 
   .header-badges {
     width: 100%;
-    gap: 8px;
+    gap: 6px;
     justify-self: start;
+  }
+
+  body[data-active-tab="timer"] .header-badges {
+    width: auto;
+  }
+
+  .update-toast {
+    left: 10px;
+    right: 10px;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    gap: 10px;
+    padding: 14px 14px 12px;
+    border-radius: 18px;
+  }
+
+  .update-toast-actions {
+    grid-template-columns: 1fr;
   }
 
   .tab-bar {
     position: fixed;
-    left: 10px;
-    right: 10px;
+    left: 8px;
+    right: 8px;
     top: auto;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    overflow: hidden;
+    gap: 6px;
     margin-top: 0;
-    padding: 8px;
-    border-radius: 24px;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    touch-action: pan-x;
-  }
-
-  .tab-bar::-webkit-scrollbar {
-    display: none;
+    padding: 6px;
+    border-radius: 20px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 14px 30px rgba(0, 0, 0, 0.3);
   }
 
   .tab-button {
-    flex: 0 0 min(108px, 31vw);
-    min-width: 86px;
-    min-height: 54px;
-    padding: 8px 4px;
-    border-radius: 18px;
-    scroll-snap-align: center;
+    min-width: 0;
+    min-height: 46px;
+    gap: 0;
+    padding: 6px 0;
+    border-radius: 15px;
+  }
+
+  .tab-icon {
+    width: 22px;
+    height: 22px;
   }
 
   .tab-label {
-    font-size: 0.74rem;
+    display: none;
+  }
+
+  .badge,
+  .badge-soft,
+  .status-chip,
+  .inline-summary,
+  .focus-pill {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.82rem;
   }
 
   .timer-orb {
-    width: min(100%, 318px);
-    padding: 28px;
+    width: min(100%, 286px);
+    padding: 24px;
   }
 
   .hero-panel {
@@ -3634,7 +3751,7 @@ body[data-phase="long"] .timer-orb {
 
   .timer-stage {
     grid-row: auto;
-    padding: 30px 0 22px;
+    padding: 18px 0 14px;
   }
 
   .timer-actions,
@@ -3664,13 +3781,27 @@ body[data-phase="long"] .timer-orb {
 
   .timer-hero {
     display: grid;
-    padding: 24px 22px 22px;
+    gap: 18px;
+    padding: 18px 16px 16px;
+  }
+
+  body[data-active-tab="timer"] .tab-panels {
+    margin-top: 12px;
+  }
+
+  body[data-active-tab="timer"] .timer-hero {
+    gap: 14px;
+    padding-top: 16px;
   }
 
   .timer-hero > .panel-head,
   .projects-shell > .panel-head {
     display: grid;
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .panel-head h2 {
+    font-size: 1.24rem;
   }
 
   .timer-actions {
@@ -3831,7 +3962,7 @@ body[data-phase="long"] .timer-orb {
   }
 
   .day-plan-shell {
-    padding: 22px 20px;
+    padding: 18px 16px;
   }
 
   .day-plan-shell > .panel-head {
