@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 48% 8%;
+    --foreground: 220 40% 96%;
+    --card: 224 42% 12%;
+    --card-foreground: 220 40% 96%;
+    --popover: 224 42% 12%;
+    --popover-foreground: 220 40% 96%;
+    --primary: 224 92% 73%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 225 28% 24%;
+    --secondary-foreground: 220 40% 96%;
+    --muted: 223 22% 18%;
+    --muted-foreground: 220 16% 68%;
+    --accent: 223 28% 24%;
+    --accent-foreground: 220 40% 96%;
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 223 18% 20%;
+    --input: 223 18% 20%;
+    --ring: 224 92% 73%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-950 text-foreground antialiased;
+    font-family: "Segoe UI Variable", "Segoe UI", "Noto Sans", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(118, 160, 255, 0.16), transparent 26%),
+      radial-gradient(circle at top right, rgba(27, 196, 125, 0.06), transparent 20%),
+      linear-gradient(180deg, #09111f 0%, #040915 100%);
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  ::selection {
+    background: rgba(122, 164, 255, 0.28);
+    color: white;
+  }
+}

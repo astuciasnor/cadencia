@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2d5bff">
+  <meta name="description" content="Cadencia: app de foco e gestao de tempo com tarefas, pausas e resumo diario.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Cadencia">
+  <meta name="application-name" content="Cadencia">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Cadencia</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="app-header-copy">
+        <p class="app-kicker">Cadencia</p>
+        <h1 class="app-title">Seu ritmo de foco, pausa e progresso em um so lugar.</h1>
+        <p class="app-subtitle">Organize o plano do dia, avance ciclo por ciclo e mantenha o foco com uma experiencia leve e acolhedora.</p>
+        <section id="pwa-install-panel" class="install-panel" aria-labelledby="pwa-install-title" hidden>
+          <div class="install-panel-copy">
+            <p class="section-label">No celular</p>
+            <h2 id="pwa-install-title" class="install-panel-title">Abra o Cadencia como app na tela inicial</h2>
+            <p id="pwa-install-feedback" class="install-panel-feedback" aria-live="polite"></p>
+          </div>
+          <div class="inline-actions install-panel-actions">
+            <button id="pwa-install-button" type="button" data-variant="secondary" hidden>Instalar app</button>
+          </div>
+          <details id="pwa-install-help" class="install-help">
+            <summary>Como instalar</summary>
+            <p id="pwa-install-instructions" class="install-help-copy"></p>
+          </details>
+        </section>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-soft">App instalavel</span>
+        <span id="pwa-installed-badge" class="badge" hidden>Rodando como app</span>
+        <span id="current-date" class="badge">Hoje</span>
+      </div>
+    </header>
+
+    <nav class="tab-bar" aria-label="Navegacao principal" role="tablist">
+      <button class="tab-button is-active" id="tab-timer" type="button" role="tab" aria-selected="true" aria-controls="panel-timer" data-tab-button="timer" data-variant="tab">
+        <span class="tab-label">Timer</span>
+      </button>
+      <button class="tab-button" id="tab-projects" type="button" role="tab" aria-selected="false" aria-controls="panel-projects" data-tab-button="projects" data-variant="tab">
+        <span class="tab-label">Projetos</span>
+      </button>
+      <button class="tab-button" id="tab-task-rhythm" type="button" role="tab" aria-selected="false" aria-controls="panel-task-rhythm" data-tab-button="task-rhythm" data-variant="tab">
+        <span class="tab-label">Ritmo</span>
+      </button>
+      <button class="tab-button" id="tab-day-plan" type="button" role="tab" aria-selected="false" aria-controls="panel-day-plan" data-tab-button="day-plan" data-variant="tab">
+        <span class="tab-label">Plano do dia</span>
+      </button>
+      <button class="tab-button" id="tab-day-progress" type="button" role="tab" aria-selected="false" aria-controls="panel-day-progress" data-tab-button="day-progress" data-variant="tab">
+        <span class="tab-label">Progresso</span>
+      </button>
+    </nav>
+
+    <section class="tab-panels">
+      <section class="tab-panel is-active" id="panel-timer" role="tabpanel" aria-labelledby="tab-timer" aria-hidden="false" data-tab-panel="timer">
+        <section class="hero-panel timer-hero">
+          <div class="panel-head">
+            <div>
+              <p class="section-label">Modo atual</p>
+              <h2 id="current-mode">Sessao de foco</h2>
+            </div>
+            <span id="timer-status" class="status-chip">Tudo pronto para comecar</span>
+          </div>
+
+          <section class="focus-card timer-focus-card" aria-label="Foco atual">
+            <p class="section-label">Foco atual</p>
+            <strong id="task-focus-label">Nenhum foco definido</strong>
+            <p id="task-focus-caption" class="focus-caption">Escolha uma tarefa ou subtarefa para guiar a proxima sessao de foco.</p>
+          </section>
+
+          <div class="timer-stage">
+            <div class="timer-orb">
+              <p class="timer-caption">Proximo bloco</p>
+              <strong id="timer-display">25:00</strong>
+              <p id="phase-hint" class="timer-hint">Escolha um foco e comece pelo proximo passo viavel.</p>
+            </div>
+          </div>
+
+          <div class="timer-actions">
+            <button id="start-button" type="button">Comecar</button>
+            <button id="pause-button" type="button" data-variant="secondary">Pausar</button>
+            <button id="reset-button" type="button" data-variant="secondary">Recomecar</button>
+            <button id="next-phase-button" type="button" data-variant="ghost">Proxima fase</button>
+          </div>
+
+          <div id="focus-time-helper" class="context-tip" hidden>
+            <p id="focus-time-helper-text">A subtarefa em foco sugere um tempo para a proxima sessao.</p>
+            <div class="inline-actions">
+              <button id="apply-focus-minutes-button" type="button" data-variant="secondary">Usar este tempo no foco</button>
+            </div>
+          </div>
+          <details class="timer-settings-disclosure">
+            <summary>Ajustes do ciclo</summary>
+            <form id="settings-form" class="stack-form timer-settings-form" novalidate>
+              <label class="field" for="focus-minutes">
+                <span>Sessao de foco</span>
+                <input id="focus-minutes" name="focusMinutes" type="number" min="1" max="120" inputmode="numeric">
+              </label>
+
+              <label class="field" for="micro-break-minutes">
+                <span>Micro pausa</span>
+                <input id="micro-break-minutes" name="microBreakMinutes" type="number" min="1" max="60" inputmode="numeric">
+              </label>
+
+              <label class="field" for="long-break-minutes">
+                <span>Pausa longa</span>
+                <input id="long-break-minutes" name="longBreakMinutes" type="number" min="1" max="90" inputmode="numeric">
+              </label>
+
+              <label class="field" for="cycles-until-long-break">
+                <span>Ciclos ate pausa longa</span>
+                <input id="cycles-until-long-break" name="cyclesUntilLongBreak" type="number" min="2" max="12" inputmode="numeric">
+              </label>
+
+              <label class="field" for="daily-target">
+                <span>Meta diaria de ciclos</span>
+                <input id="daily-target" name="dailyTarget" type="number" min="1" max="20" inputmode="numeric">
+              </label>
+
+              <label class="field field-toggle" for="phase-end-sound-enabled">
+                <span>Aviso sonoro suave ao fim das fases</span>
+                <input id="phase-end-sound-enabled" name="phaseEndSoundEnabled" type="checkbox">
+              </label>
+
+              <button type="submit">Salvar ajustes</button>
+            </form>
+            <p class="form-helper">Ajuste os ciclos sem tirar o cronometro do centro da tela.</p>
+            <p id="settings-feedback" class="form-feedback" aria-live="polite"></p>
+
+            <section class="timer-backup-tools" aria-labelledby="timer-backup-title">
+              <div class="panel-head">
+                <div>
+                  <p class="section-label">Backup</p>
+                  <h3 id="timer-backup-title" class="projects-block-title">Exportar e restaurar seus dados</h3>
+                </div>
+              </div>
+              <div class="inline-actions timer-backup-actions">
+                <button id="backup-export-button" type="button" data-variant="secondary">Exportar backup</button>
+                <button id="backup-import-button" type="button" data-variant="ghost">Importar backup</button>
+                <button id="clear-all-button" type="button" class="danger-action" data-variant="ghost">Limpar Tudo</button>
+              </div>
+              <input id="backup-import-input" type="file" accept=".json,application/json" hidden>
+              <p class="form-helper">O backup salva projetos, tarefas, subtarefas, plano do dia, ritmo, execucao, historico e ajustes em um unico arquivo JSON.</p>
+              <p id="backup-feedback" class="form-feedback" aria-live="polite"></p>
+            </section>
+          </details>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" aria-hidden="true" data-tab-panel="projects" hidden>
+        <section class="projects-grid projects-grid-single">
+          <section class="card projects-shell" aria-labelledby="projects-title">
+            <div class="panel-head">
+              <div>
+                <p class="section-label">Projetos</p>
+                <h2 id="projects-title">Arvore estrutural do projeto selecionado</h2>
+              </div>
+              <span id="projects-summary" class="inline-summary">0 projetos - 0 tarefas</span>
+            </div>
+            <form id="project-form" class="projects-create-strip" novalidate>
+              <label class="field projects-create-strip-field" for="project-input">
+                <span>Novo projeto</span>
+                <input id="project-input" name="projectTitle" type="text" maxlength="80" placeholder="Ex.: Artigo X, Disciplina Y, Pesquisa Z" required>
+              </label>
+              <label class="field projects-create-strip-color" for="project-color-input">
+                <span>Cor principal</span>
+                <input id="project-color-input" name="projectColor" type="color" value="#7AA4FF" aria-label="Cor principal do projeto">
+              </label>
+              <button type="submit">Adicionar projeto</button>
+            </form>
+            <p id="projects-feedback" class="form-feedback" aria-live="polite"></p>
+            <div class="projects-tree-toolbar">
+              <div class="projects-block-head">
+                <p class="section-label">Arvore</p>
+                <h3 class="projects-block-title">Visualize um projeto por vez</h3>
+              </div>
+              <label class="field projects-tree-select-field" for="projects-tree-select">
+                <span>Projeto exibido</span>
+                <select id="projects-tree-select" name="projectsTreeSelect">
+                  <option value="">Nenhum projeto disponivel</option>
+                </select>
+              </label>
+            </div>
+            <p class="projects-inline-intro">Escolha um projeto para visualizar sua estrutura em arvore.</p>
+            <div id="projects-tree" class="projects-tree" aria-live="polite"></div>
+          </section>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="panel-day-plan" role="tabpanel" aria-labelledby="tab-day-plan" aria-hidden="true" data-tab-panel="day-plan" hidden>
+        <section class="day-plan-grid day-plan-grid-single">
+          <section class="card day-plan-shell" aria-labelledby="day-plan-title">
+            <div class="panel-head">
+              <div>
+                <p class="section-label">Plano do dia</p>
+                <h2 id="day-plan-title">Organize o dia em duas etapas</h2>
+              </div>
+              <span id="day-plan-summary" class="inline-summary">0 itens - 0 avulsos - 0 de projetos</span>
+            </div>
+
+            <div class="day-plan-subtabs" role="tablist" aria-label="Visoes do plano do dia">
+              <button class="day-plan-subtab-button is-active" id="day-plan-subtab-compose" type="button" role="tab" aria-selected="true" aria-controls="day-plan-view-compose" data-day-plan-view-button="compose" data-variant="ghost">
+                Selecionar/Adicionar
+              </button>
+              <button class="day-plan-subtab-button" id="day-plan-subtab-table" type="button" role="tab" aria-selected="false" aria-controls="day-plan-view-table" data-day-plan-view-button="table" data-variant="ghost">
+                Tabela do dia
+              </button>
+            </div>
+
+            <section class="day-plan-view-panel is-active" id="day-plan-view-compose" role="tabpanel" aria-labelledby="day-plan-subtab-compose" data-day-plan-view-panel="compose">
+              <p class="day-plan-intro">Monte o plano do dia selecionando itens avulsos ou trazendo tarefas e subtarefas de projetos.</p>
+
+              <div class="day-plan-forms">
+                <form id="day-plan-standalone-form" class="day-plan-form" novalidate>
+                  <div class="day-plan-form-head">
+                    <p class="section-label">Item avulso</p>
+                    <h3 class="day-plan-form-title">Adicionar pendencia simples do dia</h3>
+                  </div>
+                  <label class="field" for="day-plan-standalone-input">
+                    <span>Titulo</span>
+                    <input id="day-plan-standalone-input" name="title" type="text" maxlength="80" placeholder="Ex.: Telefonema administrativo, enviar e-mail, revisar pauta" required>
+                  </label>
+                  <label class="field" for="day-plan-standalone-priority">
+                    <span>Prioridade</span>
+                    <select id="day-plan-standalone-priority" name="priority">
+                      <option value="A">A - Alta prioridade</option>
+                      <option value="M" selected>M - Media prioridade</option>
+                      <option value="B">B - Baixa prioridade</option>
+                    </select>
+                  </label>
+                  <button type="submit">Adicionar ao plano</button>
+                </form>
+
+                <form id="day-plan-source-form" class="day-plan-form" novalidate>
+                  <div class="day-plan-form-head">
+                    <p class="section-label">Item de projeto</p>
+                    <h3 class="day-plan-form-title">Trazer tarefa ou subtarefa para o dia</h3>
+                  </div>
+                  <label class="field" for="day-plan-project-filter">
+                    <span>Projeto de Origem</span>
+                    <select id="day-plan-project-filter" name="projectFilter">
+                      <option value="">Todos os projetos</option>
+                    </select>
+                  </label>
+                  <label class="field" for="day-plan-source-select">
+                    <span>Tarefa/Subtarefa do Projeto Escolhido</span>
+                    <select id="day-plan-source-select" name="source">
+                      <option value="">Escolha uma tarefa ou subtarefa</option>
+                    </select>
+                  </label>
+                  <label class="field" for="day-plan-source-priority">
+                    <span>Prioridade</span>
+                    <select id="day-plan-source-priority" name="priority">
+                      <option value="A">A - Alta prioridade</option>
+                      <option value="M" selected>M - Media prioridade</option>
+                      <option value="B">B - Baixa prioridade</option>
+                    </select>
+                  </label>
+                  <button type="submit" data-variant="secondary">Incluir item de projeto</button>
+                </form>
+              </div>
+
+              <p class="form-helper">Primeiro monte o dia. Depois revise a fila completa na sub-aba da tabela.</p>
+              <p id="day-plan-feedback" class="form-feedback" aria-live="polite"></p>
+
+            </section>
+
+            <section class="day-plan-view-panel" id="day-plan-view-table" role="tabpanel" aria-labelledby="day-plan-subtab-table" data-day-plan-view-panel="table" hidden>
+              <div class="panel-head">
+                <div>
+                  <p class="section-label">Execucao de hoje</p>
+                  <h3 id="day-plan-list-title" class="day-plan-panel-title">Tabela de tarefas selecionadas para o dia</h3>
+                </div>
+              </div>
+              <p class="day-plan-order-note">A lista e ordenada por prioridade: A primeiro, depois M e por fim B.</p>
+              <ul id="day-plan-list" class="day-plan-list" aria-live="polite"></ul>
+            </section>
+          </section>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="panel-task-rhythm" role="tabpanel" aria-labelledby="tab-task-rhythm" aria-hidden="true" data-tab-panel="task-rhythm" hidden>
+        <section class="card task-rhythm-shell" aria-labelledby="task-rhythm-title">
+          <div id="task-rhythm-content" aria-live="polite"></div>
+          <p id="execution-feedback" class="form-feedback" aria-live="polite"></p>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="panel-day-progress" role="tabpanel" aria-labelledby="tab-day-progress" aria-hidden="true" data-tab-panel="day-progress" hidden>
+        <section class="card day-progress-shell" aria-labelledby="day-progress-title">
+          <div id="day-progress-content" aria-live="polite"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
